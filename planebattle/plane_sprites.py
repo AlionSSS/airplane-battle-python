@@ -7,6 +7,7 @@ Author: ALion
 
 Date: 2020/7/18 0:21
 """
+import random
 import pygame
 from planebattle.constants import *
 
@@ -70,3 +71,27 @@ class HeroPlane(GameSprite):
             self.rect.x = -self.rect.width
         elif self.rect.x > SCREEN_WIDTH:
             self.rect.x = SCREEN_WIDTH
+
+
+class EnemyPlane(GameSprite):
+    """
+    敌机精灵
+    """
+
+    def __init__(self, *groups):
+        image_name = "./../resources/images/enemy1.png"
+        speed = random.randint(1, 3)
+        super().__init__(image_name, speed, *groups)
+        # self.rect.y = -self.rect.height
+        # 等效于上面
+        self.rect.bottom = 0
+        self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
+
+    def update(self, *args):
+        self.rect.y += self.speed
+        if self.rect.y > SCREEN_HEIGHT:
+            # 超出屏幕，销毁
+            self.kill()
+
+    def __del__(self):
+        print("__del__ %s" % self.rect)

@@ -11,7 +11,7 @@ Date: 2020/7/18 0:21
 import pygame
 
 from planebattle.constants import *
-from planebattle.plane_sprites import Background, HeroPlane
+from planebattle.plane_sprites import Background, HeroPlane, EnemyPlane
 
 
 class PlaneGame(object):
@@ -27,6 +27,8 @@ class PlaneGame(object):
         self.clock = pygame.time.Clock()
         # 精灵
         self.__create_sprites()
+        # 敌机定时事件
+        pygame.time.set_timer(CREATE_ENEMY_EVETN, 1000)
 
     def __create_sprites(self):
         # 初始化背景精灵
@@ -36,6 +38,8 @@ class PlaneGame(object):
         # 初始化英雄飞机精灵
         self.hero = HeroPlane(3)
         self.hero_group = pygame.sprite.Group(self.hero)
+        # 敌机
+        self.enemy_group = pygame.sprite.Group()
 
     def __start__(self):
         print("PlaneGame 开始游戏")
@@ -74,6 +78,10 @@ class PlaneGame(object):
                     self.hero.x_offset = 0
                 elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     self.hero.y_offset = 0
+            elif event.type == CREATE_ENEMY_EVETN:
+                print("敌机出场...")
+                enemy = EnemyPlane()
+                self.enemy_group.add(enemy)
 
     def __check_collide(self):
         pass
@@ -85,6 +93,9 @@ class PlaneGame(object):
         # 绘制Hero飞机
         self.hero_group.update()
         self.hero_group.draw(self.screen)
+        # 绘制敌机
+        self.enemy_group.update()
+        self.enemy_group.draw(self.screen)
 
     @staticmethod
     def __game_over():
