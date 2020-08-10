@@ -56,21 +56,34 @@ class HeroPlane(GameSprite):
         super().__init__(image_name, speed, *groups)
         self.rect.y = SCREEN_HEIGHT - self.rect.height
         self.rect.x = (SCREEN_WIDTH - self.rect.width) >> 1
-        self.x_offset = 0
-        self.y_offset = 0
+        self.x_speed = 0
+        self.y_speed = 0
+        # 子弹组
+        self.bullet_group = pygame.sprite.Group()
+        # 开火的开关
+        self.fire_flag = False
 
     def update(self, *args):
         # 处理移动，边界检查
-        self.rect.x += self.x_offset
-        self.rect.y += self.y_offset
-        if self.rect.y < -self.rect.height:
-            self.rect.y = -self.rect.height
-        elif self.rect.y > SCREEN_HEIGHT:
-            self.rect.y = SCREEN_HEIGHT
-        if self.rect.x < -self.rect.width:
-            self.rect.x = -self.rect.width
-        elif self.rect.x > SCREEN_WIDTH:
-            self.rect.x = SCREEN_WIDTH
+        self.rect.x += self.x_speed
+        self.rect.y += self.y_speed
+        if self.rect.y < 0:
+            self.rect.y = 0
+        elif self.rect.y > SCREEN_HEIGHT - self.rect.height:
+            self.rect.y = SCREEN_HEIGHT - self.rect.height
+        half_width = self.rect.width >> 1
+        if self.rect.x < -half_width:
+            self.rect.x = -half_width
+        elif self.rect.x > SCREEN_WIDTH - half_width:
+            self.rect.x = SCREEN_WIDTH - half_width
+
+    def fire(self):
+        if self.fire_flag:
+            # print("开始发射子弹...")
+            x = self.rect.x + (self.rect.width >> 1)
+            y = self.rect.y
+            bullet = Bullet(x, y)
+            self.bullet_group.add(bullet)
 
 
 class EnemyPlane(GameSprite):
@@ -94,4 +107,27 @@ class EnemyPlane(GameSprite):
             self.kill()
 
     def __del__(self):
-        print("__del__ %s" % self.rect)
+        # print("__del__ %s" % self.rect)
+        pass
+
+
+class Bullet(GameSprite):
+    """
+    子弹
+    """
+
+    def __init__(self, x, y, speed=-1, *groups):
+        image_name = "./../resources/images/bullet1.png"
+        super().__init__(image_name, speed, *groups)
+        self.rect.x = x - (self.rect.x >> 1)
+        self.rect.y = y - self.rect.height
+
+    def update(self, *args):
+        super().update(*args)
+        # 范围检查
+        if self.rect.y < -self.rect.height:
+            self.kill()
+
+    def __del__(self):
+        # print("__del__ %s" % self.rect)
+        pass
